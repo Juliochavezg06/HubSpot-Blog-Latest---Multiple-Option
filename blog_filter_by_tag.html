@@ -1,204 +1,291 @@
-<!--HTML MODULO DE SELECT BLOG-->
-{% if module.show_hide_module %}
-    <div class="hub-blog-post-section item-section sec-{{ module.section_name|lower|replace(' ', '-')|replace('&', '-') }}" style="background-color: {{ module.background_color.color }};">
-      <div class="max1110">
-        <div class="heading-sec">
-          {{ module.content }}
+{% set blogid = module.blog %}
+{% set tag = module.tag_field %}
+
+{% if module.filter_tag %}
+{% set topic_posts = blog_recent_tag_posts(blogid, tag, 3) %}
+{% else %}
+{% set topic_posts = blog_recent_posts(blogid, 3) %}
+{% endif %}
+<div id="blog__top" data-sal="slide-right" data-sal-duration="650" style="padding-top: {{ module.section_settings.padding_top }}px; padding-bottom: {{ module.section_settings.padding_bottom }}px">
+  <div class="container">
+    <div class="columns">
+      <div class="column">
+        <div class="content__title">
+          <h4 class="blog__bottom__subtitle" data-sal="slide-right" data-sal-duration="650">{{module.subtitle}}</h4>
+          <h2 class="blog__bottom__title" data-sal="slide-right" data-sal-duration="650">{{module.title}} <span class="rose">{{ module.title_rose }}</span></h2>
         </div>
-        <div class="row-fluid hub-blog-post-wrapper">
-          
-          {% set blogid = module.blog %}
-          {% set tag = module.tag_field %}
-          
-          {# For Blog Recent Posts #}
-          {% if module.blog_options == 'blog_recent_posts' %}
-          {% set topic_posts = blog_recent_posts(blogid, 4) %}
-          {% endif %}
-          
-          {# For Blog Topic Posts #}
-          {% if module.blog_options == 'blog_topics' %}
-          {% set topic_posts = blog_recent_tag_posts(blogid, tag, 4) %}
-          {% endif %}
-          
-          {% for topic_post in topic_posts %} 
-          <div class="hub-blog-post">
-            <div class="inner">          
-              <div class="img-wrapper" style="background-image: url('{{ topic_post.featured_image }}');"><a href="{{ topic_post.absolute_url }}"></a></div>
-              <div class="hub-post">
-    
-                {% if topic_post.topic_list %}
-                <div class="post-tags">
-                  {% for topic in topic_post.topic_list %}
-                  <a class="topic-link" href="{{ blog_tag_url(group.id, topic.slug) }}">{{ topic.name }}</a>{% if not loop.last %}{% endif %}
-                  {% endfor %}
-                </div>
-                {% endif %}  
-    
-                <h3>{{ topic_post.name }}</h3>
-                <div class="preview-text">
-                  {{ topic_post.post_list_content|truncatehtml(120, '...' , false)|striptags }}
-                </div>
-              </div>
-              <div class="hub-btn-wrapper">
-                <a href="{{ topic_post.absolute_url }}" class="read-more">{{ module.button_text }}</a>
-              </div>        
-    
-            </div>
-          </div>
-          {% endfor %}
-    
-        </div>
-        
-        <div class="bottom-btn">     
-          <a href="{{ module.button.button_url.href }}" class="btn-blog">{{ module.button.button_text }}</a>
-        </div>
-    
-    
       </div>
     </div>
-    {% endif %}
-<!--CSS DEL MODULO-->    
+    <div class="columns is-centered is-gapless">
+      <div class="content__recent__stats">
+        {% for post in topic_posts %}
+        <div class="post__recent">
+          <div class="featured__image">
+            <a href="{{ post.absolute_url }}">
+              <div class="block__image__featured" style="background-image: url('{{ post.featured_image }}');"></div>
+            </a>
+          </div>
+          <div class="content__post">
+            <h5 class="blog__top__text-title">
+              <a href="{{ post.absolute_url }}">
+                {{ post.name }}
+              </a>
+            </h5>
+            <div class="date">
+              {{ post.publish_date_local_time.strftime('%B') }}
+              {{ post.publish_date_local_time.strftime('%d') }} -
+              {{ post.publish_date_local_time.strftime('%Y') }}
+            </div>       
+            <div class="blog__bottom__element__text">{{ post.post_list_content|truncatehtml(120, '...' , false)|striptags }}</div>
+          </div>
+        </div>
+        {% endfor %}
+
+      </div>
+
+    </div>  
+  </div>
+</div>
+
 <style>
-    .hub-blog-post-section{
-  padding: 40px 20px;
+#blog__top{
+  background: #231C68;
 }
-.heading-sec{
-  padding-bottom: 40px;
-  text-align: center;
-}
-.hub-blog-post-section .heading-sec p{
-  padding-bottom: 10px;
-}
-.hub-blog-post{
-  float: left;
-  width: 25%;
-  padding: 12px;
-}
-.hub-blog-post .img-wrapper{
-  min-height: 200px;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+.blog {
   position: relative;
 }
-.img-wrapper a{
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
+.featured__image img{
   width: 100%;
-  -webkit-transition: all 200ms ease;
-  transition: all 200ms ease;
 }
-.img-wrapper a:hover{
-  background: rgba(33, 102, 251, 0.5);
+.blog__top {
+  padding: 40px 0 100px;
 }
-.hub-blog-post .hub-post{
-  padding: 16px 15px;
-  background-color: #2166fb;
-  color: #f7f8fb;
+.blog__bottom__title {
+  font-family: 'Exo', sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 35px;
+  line-height: 40px;
+  text-align: center;
+  color: #FFFFFF;
+  max-width: 450px;
+  margin: 0 auto;
 }
-.post-tags a{
-  display: inline-block;
-  margin-top: 0;
-  margin-right: 3px;
-  margin-bottom: 5px;
-  padding: 5px 7px;
-  border-style: solid;
-  border-width: 1px;
-  border-color: rgba(247, 248, 251, 0.6);
-  -webkit-transition: all 200ms ease;
-  transition: all 200ms ease;
-  color: rgba(247, 248, 251, 0.6);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0px;
-  text-decoration: none;
-  text-transform: uppercase;
+.rose{
+  color: #B01F58;
+}
+.blog__bottom__subtitle {
+  font-family: 'Exo', sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 12px;
   line-height: 14px;
-}
-.post-tags a:hover{
-  background-color: #f7f8fb;
-  color: #2166fb;
-}
-.hub-post h3{
-  font-size: 18px;
-  line-height: 24px;
-  margin-top: 10px;
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: #fff;
-  margin-top: 5px;
-  padding-bottom: 0;
-}
-.hub-btn-wrapper{
-  background-color: #2166fb;
-  background-color: #2166fb;
-  padding-left: 15px;
-  padding-bottom: 13px;
-}
-.hub-btn-wrapper a.read-more{
-  display: inline-block;
-  margin-bottom: 10px;
-  -webkit-transition: all 200ms ease;
-  transition: all 200ms ease;
-  color: #fff;
-  text-decoration: underline;
-  font-size: 16px;
-  line-height: 1.4em;
-  text-transform: uppercase;
-  font-weight: 600;
-}
-.hub-btn-wrapper a.read-more:hover{
-  padding-left: 6px;
-}
-.bottom-btn a{
-  margin-top: 10px;
-  margin-bottom: 10px;
-  padding: 10px 30px;
-  border: 1px solid transparent;
-  background-color: #ff6d10;
-  -webkit-transition: all 200ms ease;
-  transition: all 200ms ease;
-  color: #fff;
-  font-weight: 700;
   text-align: center;
+  letter-spacing: 0.25em;
+  color: #FFFFFF;
+  margin-bottom: 10px;
+}
+.blog__top__title {
+  font-style: normal;
+  font-weight: 800;
+  font-size: 25px;
+  line-height: 1.3;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #003952;
+  margin: 0;
+  margin-bottom: 2rem;
   text-decoration: none;
-  text-transform: uppercase;
-  display: inline-block;
 }
-.bottom-btn a:hover{
-  -webkit-transform: translate(0px, -2px);
-  -ms-transform: translate(0px, -2px);
-  transform: translate(0px, -2px);
-  color: #fff;
-}
-.hub-blog-post-section .bottom-btn{
-  padding-top: 20px;
+.content__title{
+  max-width: 500px;
   text-align: center;
+  margin: 0 auto;
+}
+.blog__top__subtitle {
+  font-style: normal;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-weight: 400;
+  letter-spacing: .12em;
+  color: #50576d;
+}
+.post__recent{
+  background: #fff;
+}
+.content__post{
+  padding: 20px;
+}
+.content__recent__stats{
+  display: flex;
+}
+.blog__top__text-title a {
+  text-decoration: none;
+  color: #50576d;
+  font-weight: 600;
+  font-size: 20px;
+}
+.blog__top__text-title a:hover {
+  color: #50B87F;
+}
+.blog__top__text a {
+  font-style: normal;
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 26px;
+  letter-spacing: .03em;
+  color: #152c4e;
+  text-decoration: none;
+}
+.blog__top__text a:hover {
+  color: #003952;
+}
+.blog__top__link {
+  text-align: right;
+  margin-top: 30px;
+}
+.blog__top__link a {
+  background: #218CCB;
+  border: 1px solid #218CCB;
+  border-radius: 4px;
+  padding: 10px 20px;
+  color: #fff;
+  text-decoration: none;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 16px;
+  text-align: center;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-family: 'Lato', sans-serif;
+}
+.blog__top__link a:hover {
+  background: transparent;
+  border: 1px solid #218CCB;
+  color: #218CCB;
+}
+.blog__top__left {
+}
+.blog__top__right img {
+  width: 100%;
+}
+.blog__bottom {
+  padding: 100px 0 100px;
+  background-color: #EBF7FE;
+}
+.blog__bottom__element {
+  background: #EBF7FE;
+  cursor: pointer;
+  border: 1px solid #EEF0F5;
+  display: block;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+.blog__bottom__element:hover {
+  transform: translateY(-3px);
+}
+.blog__bottom__element__content {
+  padding: 1rem 2rem;
+}
+.blog__bottom__element__title {
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 1;
+  color: #003952;
+}
+.blog__bottom__element__text {
+  font-style: normal;
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 1;
+  color: #AFAFAF;
+  margin-bottom: 2rem;
+}
+.blog__bottom__element__link {
+  text-align: right;
+}
+.blog__bottom__element__link span {
+  font-style: normal;
+  font-weight: 800;
+  font-size: 12px;
+  line-height: 1;
+  text-align: right;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #00B4C4;
+  transition: all 0.3s;
+}
+.blog__bottom__element__link span:hover {
+  color: #003952;
+}
+.blog__bottom__element__img {
+  min-height: 225px;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+}
+.blog__elements {
+  margin: 4rem 0;
+}
+.block__image__featured{
+  min-height: 200px;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+.post__recent{
+  width: 30%;
+  margin: 1%;
+}
+.post__recent:hover{
+  transform: translateY(-4px);
 }
 
-@media screen and (max-width: 990px){
-  .hub-blog-post{
-    width: 50%!important;
+@media only screen and (max-width: 768px) {
+  .blog__top__title {
+    max-width: initial;
   }
-}
-@media screen and (max-width: 767px){
-  .hub-blog-post {
-    float: none!important;
-    width: 100%!important;
-    padding: 0!important;
-    margin-bottom: 20px!important;
+  .blog__top__link {
+    text-align: center;
+    margin: 2rem 0;
+  }
+  .blog__top__left {
+    text-align: center;
+  }
+  .blog__top__right {
+    margin: 2rem 0;
+    margin-bottom: -100px;
+  }
+  .blog__top__right img {
+    position: relative;
+  }
+  .blog__bottom {
+    padding: 25px 0;
+  }
+  .blog__bottom__title {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+  .blog__bottom__subtitle {
+    text-align: center;
+  }
+  .post__recent{
+    width: 100%;
+    display: block;
+    margin-bottom: 40px;
   }
 }
 
 </style>
+
+<script>
 <!--JS DEL MODULO-->
 <script>
-    $(function(){
-  
-  // init matchHeight
-  $('.hub-post').matchHeight(); 
-  
+$(function(){
+
+// init matchHeight
+$('.hub-post').matchHeight(); 
+
 });
 </script>
